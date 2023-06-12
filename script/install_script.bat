@@ -19,4 +19,5 @@ adb push auto_order_court.sh  /system_ext/
 
 
 
+
 @REM adb root && adb pull /data/vendor/bug2go/

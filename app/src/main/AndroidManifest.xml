@@ -22,6 +22,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+<!--        <service-->
+<!--            android:name="com.motorola.server.perf.app.OcrService"-->
+<!--            android:enabled="true"-->
+<!--            android:exported="false"-->
+<!--            android:process=":remote"-->
+<!--            tools:ignore="ExportedService">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.START_OCR_SERVICE" />-->
+<!--            </intent-filter>-->
+<!--        </service>-->
     </application>
 
 </manifest>

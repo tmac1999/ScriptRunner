@@ -9,6 +9,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.motorola.scriptrunner.util.CommandResult;
 import com.motorola.scriptrunner.util.ShellUtils;
@@ -69,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
 //                        Log.i(TAG, "start click");
 //                    }
 //                }, 3 * 1000);
+                Toast.makeText(MainActivity.this,"十秒后开始，请放置于立即预约界面",Toast.LENGTH_LONG).show();
                 handler.sendEmptyMessageDelayed(1,10*1000);
             }
         });

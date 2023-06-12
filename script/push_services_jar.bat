@@ -8,7 +8,7 @@ adb remount
 
 adb push services.jar  /system/framework/
 
-
+adb reboot
 
 
 
