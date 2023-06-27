@@ -9,8 +9,13 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
+import com.lzy.okgo.model.Response;
 import com.motorola.scriptrunner.util.CommandResult;
 import com.motorola.scriptrunner.util.ShellUtils;
 
@@ -22,38 +27,74 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
     public final String TAG = "MainActivity";
+    int count = 0;
+    private String hourSet;
+    private String minSet;
     Handler handler = new Handler(Looper.myLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
 
-//            handler.sendMessageDelayed(handler.obtainMessage(), 3 * 1000);
-            run();
+            switch (msg.what) {
+                case 1:
+                    handler.sendEmptyMessageDelayed(1, delayMillis);
+                    String format = ft2.format(new Date(System.currentTimeMillis()));
+
+                    String min = format.split("-")[1];
+                    String hour = format.split("-")[0];
+
+                    tv_run_info.setText("轮询中：" + count);
+                    count++;
+                    Log.i(TAG, "start loop:" + format + ",hour:" + hour + ",min:" + min);
+                    Log.i(TAG, "start loop:" + format + ",hourSet:" + hourSet + ",minSet:" + minSet);
+
+
+                    if (hourSet.equals(hour) && minSet.equals(min)) {
+                        //run script
+                        handler.sendEmptyMessage(2);
+                    }
+                    break;
+                case 2:// time hit
+                    handler.removeMessages(1);
+                    runScript();
+                    break;
+            }
         }
     };
+    int delayMillis = 2 * 1000;
 
     private void run() {
         String format = ft2.format(new Date(System.currentTimeMillis()));
 
         String min = format.split("-")[1];
         String hour = format.split("-")[0];
-        Log.i(TAG, "start loop:" + format + ",min:" + min + ",hour:" + hour);
-        if ("07".equals(min)) {
-            //run script
+        String hourSet = et_hour.getText().toString();
+        String minSet = et_min.getText().toString();
+        Log.i(TAG, "start loop:" + format + ",hour:" + hour + ",min:" + min);
+        Log.i(TAG, "start loop:" + format + ",hourSet:" + hourSet + ",minSet:" + minSet);
 
+
+        if (hourSet.equals(hour) && minSet.equals(min)) {
+            //run script
+            runScript();
         }
         //            Runtime.getRuntime().exec("/data/data/com.motorola.scriptrunner/code_cache/auto_order_court.sh");
+//        runScript();
+//        CommandResult result = ShellUtils.execCommand("input text \"zhengpeng\"",true,true);
+//        final String strResult= String.format(COMMAND_RESULT_FORMAT, result.result, result.successMsg, result.errorMsg);
+//        Log.i(TAG, "Runtime.getRuntime:"+strResult);
+    }
+
+    private void runScript() {
         try {
             Runtime.getRuntime().exec("/system_ext/auto_order_court.sh");
             Log.i(TAG, "Runtime.getRuntime:");
         } catch (IOException e) {
             e.printStackTrace();
         }
-//        CommandResult result = ShellUtils.execCommand("input text \"zhengpeng\"",true,true);
-//        final String strResult= String.format(COMMAND_RESULT_FORMAT, result.result, result.successMsg, result.errorMsg);
-//        Log.i(TAG, "Runtime.getRuntime:"+strResult);
     }
-    private static final String COMMAND_RESULT_FORMAT="resultCode:%s,successMsg:%s,errorMsg:%s\n";
+
+    private static final String COMMAND_RESULT_FORMAT = "resultCode:%s,successMsg:%s,errorMsg:%s\n";
     SimpleDateFormat ft2;
 
     @Override
@@ -70,8 +111,64 @@ public class MainActivity extends AppCompatActivity {
 //                        Log.i(TAG, "start click");
 //                    }
 //                }, 3 * 1000);
-                Toast.makeText(MainActivity.this,"十秒后开始，请放置于立即预约界面",Toast.LENGTH_LONG).show();
-                handler.sendEmptyMessageDelayed(1,10*1000);
+                hourSet = et_hour.getText().toString();
+
+                minSet = et_min.getText().toString();
+                Toast.makeText(MainActivity.this, "即将于" + hourSet + ":" + minSet + "开始，请放置于立即预约界面", Toast.LENGTH_LONG).show();
+//                handler.sendEmptyMessageDelayed(1, 10 * 1000);//for test
+                handler.removeMessages(1);
+                handler.sendEmptyMessageDelayed(1, delayMillis);//for test
+            }
+        });
+        findViewById(R.id.tv_network_request).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                new Thread() {
+                    int count = 0;
+
+                    @Override
+                    public void run() {
+                        super.run();
+                        while (true) {
+                            try {
+                                Thread.sleep(3 * 1000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            count++;
+                            String url = "https://www.baidu.com/";
+//                String url = "https://mmibug2go.appspot.com/#/app/report/323003474";
+                            request(url);
+                            Log.i("RUN", "RUNNING" + count);
+                        }
+                    }
+                }.start();
+            }
+        });
+        et_hour = findViewById(R.id.et_hour);
+        et_min = findViewById(R.id.et_min);
+        tv_run_info = findViewById(R.id.tv_run_info);
+    }
+
+    EditText et_hour, et_min;
+    TextView tv_run_info;
+
+    private void request(String url) {
+        OkGo.<String>get(url).tag(this).execute(new StringCallback() {
+
+            @Override
+            public void onSuccess(Response<String> response) {
+                String bodyData = response.body();
+//                GmBean data = new Gson().fromJson(bodyData, GmBean.class);
+                Log.i("onSuccess", bodyData.toString());
+            }
+
+
+            @Override
+            public void onError(Response<String> response) {
+                super.onError(response);
+                Log.i("onError", response.toString());
             }
         });
     }
