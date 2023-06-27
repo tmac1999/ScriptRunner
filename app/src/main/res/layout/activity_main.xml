@@ -15,8 +15,32 @@
         android:gravity="center"
         android:text="Run sh"
         android:textSize="30dp" />
+    <TextView
+        android:id="@+id/tv_run_info"
+        android:layout_width="200dp"
+        android:layout_height="100dp"
+        android:background="#2320"
+        android:gravity="center"
+        android:text="Info"
+        android:textSize="20dp" />
+    <TextView
+        android:id="@+id/tv_network_request"
+        android:layout_width="200dp"
+        android:layout_height="160dp"
+        android:background="#2320"
+        android:gravity="center"
+        android:text="Request Net"
+        android:textSize="30dp" />
     <EditText
         android:layout_width="200dp"
-        android:hint="顶顶顶"
+        android:id="@+id/et_hour"
+        android:hint="设置小时(24整数)"
+        android:inputType="number"
+        android:layout_height="100dp"/>
+    <EditText
+        android:id="@+id/et_min"
+        android:layout_width="200dp"
+        android:hint="设置分钟(60整数)"
+        android:inputType="number"
         android:layout_height="100dp"/>
 </androidx.appcompat.widget.LinearLayoutCompat>
