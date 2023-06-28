@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -28,8 +29,8 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity {
     public final String TAG = "MainActivity";
     int count = 0;
-    private String hourSet;
-    private String minSet;
+    private int hourSet;
+    private int minSet;
     Handler handler = new Handler(Looper.myLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
@@ -40,16 +41,17 @@ public class MainActivity extends AppCompatActivity {
                     handler.sendEmptyMessageDelayed(1, delayMillis);
                     String format = ft2.format(new Date(System.currentTimeMillis()));
 
-                    String min = format.split("-")[1];
-                    String hour = format.split("-")[0];
+                    int min = Integer.parseInt(format.split("-")[1]);
+                    int hour = Integer.parseInt(format.split("-")[0]);
 
-                    tv_run_info.setText("轮询中：" + count);
+                    String text = "轮询中：" + count;
+                    tv_run_info.setText(text);
                     count++;
                     Log.i(TAG, "start loop:" + format + ",hour:" + hour + ",min:" + min);
                     Log.i(TAG, "start loop:" + format + ",hourSet:" + hourSet + ",minSet:" + minSet);
 
 
-                    if (hourSet.equals(hour) && minSet.equals(min)) {
+                    if (hourSet == hour && minSet == min) {
                         //run script
                         handler.sendEmptyMessage(2);
                     }
@@ -85,10 +87,16 @@ public class MainActivity extends AppCompatActivity {
 //        Log.i(TAG, "Runtime.getRuntime:"+strResult);
     }
 
+    String path_8_am = "/system_ext/auto_order_court.sh";
+    String path_13_am = "/system_ext/auto_order_court_test.sh";
+    String path_exe = path_8_am;
+
     private void runScript() {
         try {
-            Runtime.getRuntime().exec("/system_ext/auto_order_court.sh");
-            Log.i(TAG, "Runtime.getRuntime:");
+            Runtime.getRuntime().exec(path_exe);
+//            String path = Environment.getExternalStorageDirectory().getPath() + "/auto_order_court.sh";
+            Runtime.getRuntime().exec(path_exe);
+            Log.i(TAG, "Runtime.getRuntime:" + path_exe);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -111,9 +119,9 @@ public class MainActivity extends AppCompatActivity {
 //                        Log.i(TAG, "start click");
 //                    }
 //                }, 3 * 1000);
-                hourSet = et_hour.getText().toString();
+                hourSet = Integer.parseInt(et_hour.getText().toString());
 
-                minSet = et_min.getText().toString();
+                minSet = Integer.parseInt(et_min.getText().toString());
                 Toast.makeText(MainActivity.this, "即将于" + hourSet + ":" + minSet + "开始，请放置于立即预约界面", Toast.LENGTH_LONG).show();
 //                handler.sendEmptyMessageDelayed(1, 10 * 1000);//for test
                 handler.removeMessages(1);
@@ -144,6 +152,22 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 }.start();
+            }
+        });
+        TextView tv_run_setting = findViewById(R.id.tv_run_setting);
+        tv_run_setting.setOnClickListener(new View.OnClickListener() {
+            boolean isTest = false;
+
+            @Override
+            public void onClick(View v) {
+                if (isTest) {//如果是测试，点击之后变成正式
+                    path_exe = path_8_am;
+                    isTest = false;
+                } else {//如果正式，点击后变测试脚本
+                    path_exe = path_13_am;
+                    isTest = true;
+                }
+                tv_run_setting.setText(path_exe);
             }
         });
         et_hour = findViewById(R.id.et_hour);

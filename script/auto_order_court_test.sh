@@ -7,9 +7,9 @@ sleep 1
 #input tap 564 370
 #sleep 1
 #点击8点 2号场
-input tap 430 630
+#input tap 430 630
 #点击13~14点 1号场
-#input tap 227 1072
+input tap 227 1072
 #点击提交订单
 input tap 630 2170
 sleep 1
