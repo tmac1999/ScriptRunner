@@ -7,6 +7,7 @@ adb remount
 @REM adb push D:\Users\zhengpeng2\AndroidStudioProjects\MaxeSetting\app\build\outputs\apk\debug\app-debug.apk  /system_ext/priv-app/MaxeApp/
 adb shell "rm /system_ext/priv-app/ScriptRunner/*.apk"
 adb push app/build/outputs/apk/debug/app-debug.apk  /system_ext/priv-app/ScriptRunner/
+@REM adb push Settings.apk  /system_ext/priv-app/Settings/
 adb reboot
 
 

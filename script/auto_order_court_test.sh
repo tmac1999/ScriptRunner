@@ -1,5 +1,8 @@
 #选择西区court
 #input text "zhengpeng"
+#点击逸诚体育公园
+#input tap 306 1060
+#sleep 1
 #点击立即预约
 input tap 550 1700
 sleep 1
@@ -16,13 +19,13 @@ sleep 1
 #预约人加号
 input tap 926 1007
 sleep 1
-input text "zhengpeng"
+input text "zhengp"
 #小键盘回车 输入名字
 input tap 990 2420
 #下一行 输入电话
 input tap 400 1320
 sleep 1
-input text "13121197272"
+input text "18910864698"
 input tap 400 1440
 input text "shuangqinglu"
 #小键盘回车 输入地址

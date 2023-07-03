@@ -6,8 +6,8 @@ adb root
 adb remount
 @REM adb push D:\Users\zhengpeng2\AndroidStudioProjects\MaxeSetting\app\build\outputs\apk\debug\app-debug.apk  /system_ext/priv-app/MaxeApp/
 
-adb push auto_order_court_test.sh  /system_ext/
-adb shell chmod 777 /system_ext/auto_order_court_test.sh
+adb push auto_order_court.sh  /system_ext/
+adb shell chmod 777 /system_ext/auto_order_court.sh
 
 
 

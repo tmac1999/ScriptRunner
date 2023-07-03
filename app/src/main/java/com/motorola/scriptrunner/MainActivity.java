@@ -10,6 +10,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,18 +41,20 @@ public class MainActivity extends AppCompatActivity {
                 case 1:
                     handler.sendEmptyMessageDelayed(1, delayMillis);
                     String format = ft2.format(new Date(System.currentTimeMillis()));
+                    String[] splitTime = format.split("-");
+                    int sec = Integer.parseInt(splitTime[2]);
+                    int min = Integer.parseInt(splitTime[1]);
+                    int hour = Integer.parseInt(splitTime[0]);
 
-                    int min = Integer.parseInt(format.split("-")[1]);
-                    int hour = Integer.parseInt(format.split("-")[0]);
 
                     String text = "轮询中：" + count;
                     tv_run_info.setText(text);
                     count++;
-                    Log.i(TAG, "start loop:" + format + ",hour:" + hour + ",min:" + min);
+                    Log.i(TAG, "start loop:" + format + ",hour:" + hour + ",min:" + min+ ",sec:" + sec);
                     Log.i(TAG, "start loop:" + format + ",hourSet:" + hourSet + ",minSet:" + minSet);
 
 
-                    if (hourSet == hour && minSet == min) {
+                    if (hourSet == hour && minSet == (min+1)&&sec>50) {//在设定时间前10秒开始脚本，因为脚本包含了开启录屏的时间
                         //run script
                         handler.sendEmptyMessage(2);
                     }
@@ -95,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             Runtime.getRuntime().exec(path_exe);
 //            String path = Environment.getExternalStorageDirectory().getPath() + "/auto_order_court.sh";
-            Runtime.getRuntime().exec(path_exe);
+//            Runtime.getRuntime().exec(path_exe);
             Log.i(TAG, "Runtime.getRuntime:" + path_exe);
         } catch (IOException e) {
             e.printStackTrace();
@@ -108,6 +111,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().
+                addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_main);
         ft2 = new SimpleDateFormat("HH-mm-ss-SSS", Locale.CHINA);
         findViewById(R.id.tv_run).setOnClickListener(new View.OnClickListener() {
