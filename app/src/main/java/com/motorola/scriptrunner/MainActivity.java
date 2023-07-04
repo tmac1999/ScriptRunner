@@ -40,7 +40,8 @@ public class MainActivity extends AppCompatActivity {
             switch (msg.what) {
                 case 1:
                     handler.sendEmptyMessageDelayed(1, delayMillis);
-                    String format = ft2.format(new Date(System.currentTimeMillis()));
+                    long date = System.currentTimeMillis() + 10 * 1000;//（设置的时间是00:00:00,那么现实时间23:59:50+10时，会相等）在设定时间前10秒开始脚本，因为脚本包含了开启录屏的时间
+                    String format = ft2.format(new Date(date));
                     String[] splitTime = format.split("-");
                     int sec = Integer.parseInt(splitTime[2]);
                     int min = Integer.parseInt(splitTime[1]);
@@ -50,11 +51,11 @@ public class MainActivity extends AppCompatActivity {
                     String text = "轮询中：" + count;
                     tv_run_info.setText(text);
                     count++;
-                    Log.i(TAG, "start loop:" + format + ",hour:" + hour + ",min:" + min+ ",sec:" + sec);
+                    Log.i(TAG, "start loop:" + format + ",hour:" + hour + ",min:" + min + ",sec:" + sec);
                     Log.i(TAG, "start loop:" + format + ",hourSet:" + hourSet + ",minSet:" + minSet);
 
 
-                    if (hourSet == hour && minSet == (min+1)&&sec>50) {//在设定时间前10秒开始脚本，因为脚本包含了开启录屏的时间
+                    if (hourSet == hour && minSet == min) {
                         //run script
                         handler.sendEmptyMessage(2);
                     }
