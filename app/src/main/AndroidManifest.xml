@@ -2,13 +2,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.motorola.scriptrunner">
-    <uses-permission android:name="android.permission.INJECT_EVENTS"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <uses-permission android:name="android.permission.INJECT_EVENTS" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
+        android:name=".CoreApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:name=".CoreApplication"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -24,16 +27,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-<!--        <service-->
-<!--            android:name="com.motorola.server.perf.app.OcrService"-->
-<!--            android:enabled="true"-->
-<!--            android:exported="false"-->
-<!--            android:process=":remote"-->
-<!--            tools:ignore="ExportedService">-->
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.START_OCR_SERVICE" />-->
-<!--            </intent-filter>-->
-<!--        </service>-->
+        <!--        <service-->
+        <!--            android:name="com.motorola.server.perf.app.OcrService"-->
+        <!--            android:enabled="true"-->
+        <!--            android:exported="false"-->
+        <!--            android:process=":remote"-->
+        <!--            tools:ignore="ExportedService">-->
+        <!--            <intent-filter>-->
+        <!--                <action android:name="android.intent.action.START_OCR_SERVICE" />-->
+        <!--            </intent-filter>-->
+        <!--        </service>-->
+        <receiver
+            android:name=".MyAlarmReceiver"
+            android:process=":newinst"></receiver>
     </application>
 
 </manifest>

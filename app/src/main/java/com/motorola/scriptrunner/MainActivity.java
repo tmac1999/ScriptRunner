@@ -3,6 +3,13 @@ package com.motorola.scriptrunner;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlarmManager;
+import android.app.DatePickerDialog;
+import android.app.PendingIntent;
+import android.app.TimePickerDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.icu.util.Calendar;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -11,8 +18,10 @@ import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.lzy.okgo.OkGo;
@@ -25,10 +34,12 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 //https://stackoverflow.com/questions/5383401/android-inject-events-permission
 
 public class MainActivity extends AppCompatActivity {
-    public final String TAG = "MainActivity";
+    public static final String TAG = "MainActivity";
     int count = 0;
     private int hourSet;
     private int minSet;
@@ -39,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
             switch (msg.what) {
                 case 1:
-                    handler.sendEmptyMessageDelayed(1, delayMillis);
+//                    handler.sendEmptyMessageDelayed(1, delayMillis);
                     long date = System.currentTimeMillis() + 10 * 1000;//（设置的时间是00:00:00,那么现实时间23:59:50+10时，会相等）在设定时间前10秒开始脚本，因为脚本包含了开启录屏的时间
                     String format = ft2.format(new Date(date));
                     String[] splitTime = format.split("-");
@@ -52,16 +63,18 @@ public class MainActivity extends AppCompatActivity {
                     tv_run_info.setText(text);
                     count++;
                     Log.i(TAG, "start loop:" + format + ",hour:" + hour + ",min:" + min + ",sec:" + sec);
-                    Log.i(TAG, "start loop:" + format + ",hourSet:" + hourSet + ",minSet:" + minSet);
+                    Log.i(TAG, "start loop:" + format + ",hourSet:" + hourSet + ",minSet:" + minSet + "count:" + count);
 
 
                     if (hourSet == hour && minSet == min) {
                         //run script
+                        timer.cancel();
                         handler.sendEmptyMessage(2);
                     }
                     break;
                 case 2:// time hit
                     handler.removeMessages(1);
+                    timer.cancel();
                     runScript();
                     break;
             }
@@ -69,33 +82,12 @@ public class MainActivity extends AppCompatActivity {
     };
     int delayMillis = 2 * 1000;
 
-    private void run() {
-        String format = ft2.format(new Date(System.currentTimeMillis()));
 
-        String min = format.split("-")[1];
-        String hour = format.split("-")[0];
-        String hourSet = et_hour.getText().toString();
-        String minSet = et_min.getText().toString();
-        Log.i(TAG, "start loop:" + format + ",hour:" + hour + ",min:" + min);
-        Log.i(TAG, "start loop:" + format + ",hourSet:" + hourSet + ",minSet:" + minSet);
+    static String path_8_am = "/system_ext/auto_order_court.sh";
+    static String path_13_am = "/system_ext/auto_order_court_test.sh";
+    static String path_exe = path_8_am;
 
-
-        if (hourSet.equals(hour) && minSet.equals(min)) {
-            //run script
-            runScript();
-        }
-        //            Runtime.getRuntime().exec("/data/data/com.motorola.scriptrunner/code_cache/auto_order_court.sh");
-//        runScript();
-//        CommandResult result = ShellUtils.execCommand("input text \"zhengpeng\"",true,true);
-//        final String strResult= String.format(COMMAND_RESULT_FORMAT, result.result, result.successMsg, result.errorMsg);
-//        Log.i(TAG, "Runtime.getRuntime:"+strResult);
-    }
-
-    String path_8_am = "/system_ext/auto_order_court.sh";
-    String path_13_am = "/system_ext/auto_order_court_test.sh";
-    String path_exe = path_8_am;
-
-    private void runScript() {
+    public static void runScript() {
         try {
             Runtime.getRuntime().exec(path_exe);
 //            String path = Environment.getExternalStorageDirectory().getPath() + "/auto_order_court.sh";
@@ -119,47 +111,56 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.tv_run).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                handler.postDelayed(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        Log.i(TAG, "start click");
-//                    }
-//                }, 3 * 1000);
-                hourSet = Integer.parseInt(et_hour.getText().toString());
+                String hour = et_hour.getText().toString();
+                hourSet = Integer.parseInt(hour.equals("") ? "0" : hour);
+//
+                String min = et_min.getText().toString();
+                minSet = Integer.parseInt(min.equals("") ? "0" : min);
 
-                minSet = Integer.parseInt(et_min.getText().toString());
-                Toast.makeText(MainActivity.this, "即将于" + hourSet + ":" + minSet + "开始，请放置于立即预约界面", Toast.LENGTH_LONG).show();
-//                handler.sendEmptyMessageDelayed(1, 10 * 1000);//for test
-                handler.removeMessages(1);
-                handler.sendEmptyMessageDelayed(1, delayMillis);//for test
+
+                Log.i(TAG, "Runtime.getRuntime:onClick");
+
+//                AlarmManager alarmMgr = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+//                Intent intent = new Intent(MainActivity.this, MyAlarmReceiver.class);
+//                PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, intent, 0);
+//                Calendar time = Calendar.getInstance();
+//                time.setTimeInMillis(System.currentTimeMillis());
+//                time.add(Calendar.SECOND, 30);
+//                alarmMgr.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), pendingIntent);
+
+                setAlarm();
+
             }
         });
-        findViewById(R.id.tv_network_request).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-                new Thread() {
-                    int count = 0;
+        findViewById(R.id.tv_network_request).
 
+                setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void run() {
-                        super.run();
-                        while (true) {
-                            try {
-                                Thread.sleep(3 * 1000);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                            count++;
-                            String url = "https://www.baidu.com/";
+                    public void onClick(View v) {
+
+                        new Thread() {
+                            int count = 0;
+
+                            @Override
+                            public void run() {
+                                super.run();
+                                while (true) {
+                                    try {
+                                        Thread.sleep(3 * 1000);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                    count++;
+                                    String url = "https://www.baidu.com/";
 //                String url = "https://mmibug2go.appspot.com/#/app/report/323003474";
-                            request(url);
-                            Log.i("RUN", "RUNNING" + count);
-                        }
+                                    request(url);
+                                    Log.i("RUN", "RUNNING" + count);
+                                }
+                            }
+                        }.start();
                     }
-                }.start();
-            }
-        });
+                });
         TextView tv_run_setting = findViewById(R.id.tv_run_setting);
         tv_run_setting.setOnClickListener(new View.OnClickListener() {
             boolean isTest = false;
@@ -177,10 +178,24 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         et_hour = findViewById(R.id.et_hour);
+
         et_min = findViewById(R.id.et_min);
+
         tv_run_info = findViewById(R.id.tv_run_info);
     }
 
+    TimerTask task = new TimerTask() {
+
+        @Override
+
+        public void run() {
+
+
+        }
+
+    };
+
+    Timer timer = new Timer();
     EditText et_hour, et_min;
     TextView tv_run_info;
 
@@ -203,4 +218,54 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    public void setAlarm() {
+        final Calendar date;
+        final Calendar currentDate = Calendar.getInstance();
+        date = Calendar.getInstance();
+        new DatePickerDialog(MainActivity.this, new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                date.set(year, monthOfYear, dayOfMonth);
+                new TimePickerDialog(MainActivity.this, new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        date.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        date.set(Calendar.MINUTE, minute);
+                        date.set(Calendar.SECOND, 0);
+
+                        Log.i(TAG, "The choosen one " + date.getTime() + ",hourOfDay:" + hourOfDay + ",minute:" + minute);
+                        hourSet = hourOfDay;
+                        minSet = minute;
+                        TextView tv_run_info_time = findViewById(R.id.tv_run_info_time);
+                        tv_run_info_time.setText(ft2.format(date.getTime()));
+                        long timeInMillis = date.getTimeInMillis()-10*1000;//提前10秒执行闹钟 打开录屏
+                        startAlarm(timeInMillis);
+                        Toast.makeText(MainActivity.this, "即将于" + hourSet + ":" + minSet + "开始，请放置于立即预约界面", Toast.LENGTH_LONG).show();
+
+                    }
+                }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), false).show();
+            }
+        }, currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DATE)).show();
+//        DateFormat dateFormat = 安卓.text.format.DateFormat.getDateFormat(getApplicationContext());
+
+    }
+
+    private void startAlarm(long timeInMillis) {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        //Passing data
+        String title = "mTitle.getText().toString()";
+        String message = "mMessage.getText().toString()";
+
+        int id = (int) System.currentTimeMillis();
+        Intent intent = new Intent(this, MyAlarmReceiver.class);
+        intent.putExtra("Title", title);
+        intent.putExtra("Message", message);
+        intent.putExtra("ID", id);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, id, intent, PendingIntent.FLAG_IMMUTABLE);
+
+        String format = ft2.format(new Date(timeInMillis));
+        Log.i(TAG, "startAlarm setExact: " + format);
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, timeInMillis, pendingIntent);
+
+    }
 }

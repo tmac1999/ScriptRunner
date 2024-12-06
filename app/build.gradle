@@ -48,7 +48,12 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation files('libs\\okgo-3.0.4.jar')
     implementation files('libs\\okhttp-3.8.1.jar')
+    implementation files('libs\\SAT.jar')
+//    implementation files('libs\\SAT.jar')
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    implementation "com.sun.jersey:jersey-multipart:1.9.1"
+    implementation "com.sun.jersey:jersey-client:1.9.1"
+
 }
