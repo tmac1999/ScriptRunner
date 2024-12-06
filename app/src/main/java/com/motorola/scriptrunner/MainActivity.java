@@ -38,7 +38,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 //https://stackoverflow.com/questions/5383401/android-inject-events-permission
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity { //todo  预定国网
     public static final String TAG = "MainActivity";
     int count = 0;
     private int hourSet;
